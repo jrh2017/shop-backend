@@ -1,0 +1,23 @@
+{
+  "name": "shop-backend",
+  "version": "1.0.0",
+  "description": "this is a test project for vue & nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "vue nodejs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jrh2017/shop-backend.git"
+  },
+  "keywords": [
+    "vue",
+    "nodejs"
+  ],
+  "author": "613870505@qq.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jrh2017/shop-backend/issues"
+  },
+  "homepage": "https://github.com/jrh2017/shop-backend#readme"
+}
