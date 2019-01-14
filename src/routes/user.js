@@ -2,6 +2,8 @@ import exception from 'class/exception';
 
 import { request, summary, body, tags, middlewares, path, description } from 'swag';
 
+let func = require('../sql/func');
+
 const tag = tags(['User']);
 const userSchema = {
   name: { type: 'string', required: true },
@@ -34,9 +36,28 @@ export default class UserRouter {
   @body(userSchema)
   static async login(ctx) {
     const { name, password } = ctx.validatedBody;
-    if (password !== '123456') throw new exception.ForbiddenError('wrong password');
-    const user = { name };
-    ctx.body = { user };
+    let sql = 'select * from user WHERE user_name = ? and password = ?';
+    let arr = [name, password];
+    await func.connPool(sql, arr).then(result => {
+      if(!result.length) {
+        ctx.body = {
+          code: 0,
+          msg: '用户不存在'
+        }
+        return
+      }
+      let user = {
+        user_id: result[0].id,
+        user_name: result[0].user_name,
+        role: result[0].role,
+      };
+      ctx.body = {
+        code: 1,
+        data: user
+      }
+    }).catch(err => {
+      console.log(err)
+    });
   }
 
   @request('get', '/user')
