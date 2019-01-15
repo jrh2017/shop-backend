@@ -1,6 +1,6 @@
 import exception from 'class/exception';
-
 import { request, summary, body, tags, middlewares, path, description } from 'swag';
+import tools from 'utils/tools'
 
 let func = require('../sql/func');
 let md5 = require('md5');
@@ -88,8 +88,8 @@ export default class UserRouter {
                         user_id: n.id,
                         user_name: n.user_name,
                         role: n.role,
-                        create_time: n.create_time,
-                        update_time: n.update_time
+                        create_time: tools.dateFtt('yyyy-MM-dd hh:mm:ss', n.create_time),
+                        update_time: tools.dateFtt('yyyy-MM-dd hh:mm:ss', n.update_time)
                     })
                 })
             }
@@ -115,8 +115,8 @@ export default class UserRouter {
                         user_id: n.id,
                         user_name: n.user_name,
                         role: n.role,
-                        create_time: n.create_time,
-                        update_time: n.update_time
+                        create_time: tools.dateFtt('yyyy-MM-dd hh:mm:ss', n.create_time),
+                        update_time: tools.dateFtt('yyyy-MM-dd hh:mm:ss', n.update_time)
                     })
                 })
             }
