@@ -27,7 +27,7 @@ export default class UserRouter {
     @body(userSchema)
     static async register(ctx) {
         const { name, password } = ctx.validatedBody;
-        let sql = 'select * from user WHERE user_name = ?';
+        let sql = 'select * from users WHERE user_name = ?';
         let arr = [name];
         let user = null;
         await func.connPool(sql, arr).then(result => {
@@ -41,7 +41,7 @@ export default class UserRouter {
         if(user && user.length) {
             return
         }
-        let insertSql = 'INSERT INTO user(user_name, password, role, create_time, update_time) VALUES(?,?,?,?,?)';
+        let insertSql = 'INSERT INTO users(user_name, password, role, create_time, update_time) VALUES(?,?,?,?,?)';
         let insertArr = [name, md5(password), 1, new Date(), new Date()];
         await func.connPool(insertSql, insertArr).then(result => {
             ctx.body = { code: 1, data: '新增用户成功！' };
@@ -56,7 +56,7 @@ export default class UserRouter {
     @body(userSchema)
     static async login(ctx) {
         const { name, password } = ctx.validatedBody;
-        let sql = 'select * from user WHERE user_name = ? and password = ?';
+        let sql = 'select * from users WHERE user_name = ? and password = ?';
         let arr = [name, md5(password)];
         await func.connPool(sql, arr).then(result => {
             if (!result.length) {
@@ -78,7 +78,7 @@ export default class UserRouter {
     @summary('查询所有用户')
     @tag
     static async getAll(ctx) {
-        let sql = 'select * from user';
+        let sql = 'select * from users';
         let arr = []
         await func.connPool(sql, arr).then(result => {
             let users = []
@@ -105,7 +105,7 @@ export default class UserRouter {
     @path({ id: { type: 'string', required: true } })
     static async getOne(ctx) {
         const { id } = ctx.validatedParams;
-        let sql = 'select * from user WHERE id = ?';
+        let sql = 'select * from users WHERE id = ?';
         let arr = [id]
         await func.connPool(sql, arr).then(result => {
             let users = []
@@ -132,7 +132,7 @@ export default class UserRouter {
     @path({ id: { type: 'string', required: true } })
     static async deleteOne(ctx) {
         const { id } = ctx.validatedParams;
-        let sql = 'delete from user WHERE id = ?';
+        let sql = 'delete from users WHERE id = ?';
         let arr = [id]
         await func.connPool(sql, arr).then(result => {
             if(result.affectedRows == 0) {
