@@ -1,7 +1,6 @@
 let mysql = require('mysql');
 let db = require('../configs/db');
 let pool = mysql.createPool(db);
-
 module.exports = {
     connPool (sql, values) {
         return new Promise(( resolve, reject ) => {
