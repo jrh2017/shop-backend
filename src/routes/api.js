@@ -2,6 +2,7 @@ import Router from 'koa-router';
 
 import SampleRouter from 'routes/sample';
 import UserRouter from 'routes/user';
+import PatientRouter from 'routes/patient'
 
 import { wrapper } from 'swag';
 
@@ -21,4 +22,5 @@ router.swagger({
 
 router.map(SampleRouter);
 router.map(UserRouter);
+router.map(PatientRouter);
 export default router;

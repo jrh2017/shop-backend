@@ -6,7 +6,7 @@ class InputError extends Error {
   constructor(field) {
     super(`参数 '${field}' 不正确, 请检查!`);
     this.field = field;
-    this.status = 400;
+    this.status = 200;
   }
 }
 
