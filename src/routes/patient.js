@@ -29,15 +29,17 @@ export default class PatientRouter {
     static async addPatient(ctx) {
         let params = ctx.validatedBody;
         if (!params.age) params.age = null
+        if (!params.age) params.age = null
         if (!params.height) params.height = null
         if (!params.weight) params.weight = null
         if (!params.body_area) params.body_area = null
-        let sql = 'INSERT INTO patient_basic_info (idcard, name, sex, age, height, weight, body_area, phone, bed_no, clinical_diagnosis, chemotherapy_history, allergy_history, physical_power, pleural_effussion, loose_stools, infection, renal_disease, hepatosis, radiation, other, other_desc, ugt1a1_28, ugt1a1_28_1_1, ugt1a1_28_1_28, ugt1a1_28_28_28, ugt1a1_6, ugt1a1_6_1_1, ugt1a1_6_1_6, ugt1a1_6_6_6, glucuronidase_blood, glucuronidase_blood_concentration, glucuronidase_shit, glucuronidase_shit_concentration, glucuronidase_undo, create_time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-        let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_1_1, params.ugt1a1_28_1_28, params.ugt1a1_28_28_28, params.ugt1a1_6, params.ugt1a1_6_1_1, params.ugt1a1_6_1_6, params.ugt1a1_6_6_6, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, new Date()];
+        let sql = 'INSERT INTO patient_basic_info (idcard, name, sex, age, height, weight, body_area, phone, bed_no, clinical_diagnosis, chemotherapy_history, allergy_history, physical_power, pleural_effussion, loose_stools, infection, renal_disease, hepatosis, radiation, other, other_desc, ugt1a1_28, ugt1a1_28_type, ugt1a1_6, ugt1a1_6_type, glucuronidase_blood, glucuronidase_blood_concentration, glucuronidase_shit, glucuronidase_shit_concentration, glucuronidase_undo, create_time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+        let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_type, params.ugt1a1_6, params.ugt1a1_6_type, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, new Date()];
         await func.connPool(sql, arr).then(result => {
             ctx.body = { code: 1, data: '新增患者成功！' };
         }).catch(err => {
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            console.log('err', err)
+            ctx.body = { code: 0, data: '新增患者失败！' };
         });
     }
 
@@ -61,12 +63,12 @@ export default class PatientRouter {
                 })
             }
         }).catch(err => {
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            ctx.body = { code: 0, data: '获取患者列表失败！' };
         });
         await func.connPool(sql2, []).then(result => {
             ctx.body = { code: 1, data: users, total: result[0].total}
         }).catch(err => {
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            ctx.body = { code: 0, data: '获取患者列表失败！' };
         });
     }
 
@@ -82,13 +84,13 @@ export default class PatientRouter {
         if (!params.height) params.height = null
         if (!params.weight) params.weight = null
         if (!params.body_area) params.body_area = null
-        let sql = 'update patient_basic_info set idcard = ?, name = ?, sex = ?, age = ?, height = ?, weight = ?, body_area = ?, phone = ?, bed_no = ?, clinical_diagnosis = ?, chemotherapy_history = ?, allergy_history = ?, physical_power = ?, pleural_effussion = ?, loose_stools = ?, infection = ?, renal_disease = ?, hepatosis = ?, radiation = ?, other = ?, other_desc = ?, ugt1a1_28 = ?, ugt1a1_28_1_1 = ?, ugt1a1_28_1_28 = ?, ugt1a1_28_28_28 = ?, ugt1a1_6 = ?, ugt1a1_6_1_1 = ?, ugt1a1_6_1_6 = ?, ugt1a1_6_6_6 = ?, glucuronidase_blood = ?, glucuronidase_blood_concentration = ?, glucuronidase_shit = ?, glucuronidase_shit_concentration = ?, glucuronidase_undo = ? where id =?';
-        let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_1_1, params.ugt1a1_28_1_28, params.ugt1a1_28_28_28, params.ugt1a1_6, params.ugt1a1_6_1_1, params.ugt1a1_6_1_6, params.ugt1a1_6_6_6, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, params.id];
+        let sql = 'update patient_basic_info set idcard = ?, name = ?, sex = ?, age = ?, height = ?, weight = ?, body_area = ?, phone = ?, bed_no = ?, clinical_diagnosis = ?, chemotherapy_history = ?, allergy_history = ?, physical_power = ?, pleural_effussion = ?, loose_stools = ?, infection = ?, renal_disease = ?, hepatosis = ?, radiation = ?, other = ?, other_desc = ?, ugt1a1_28 = ?, ugt1a1_28_type = ?, ugt1a1_6 = ?, ugt1a1_6_type = ?, glucuronidase_blood = ?, glucuronidase_blood_concentration = ?, glucuronidase_shit = ?, glucuronidase_shit_concentration = ?, glucuronidase_undo = ? where id =?';
+        let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_type, params.ugt1a1_6, params.ugt1a1_6_type, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, params.id];
         await func.connPool(sql, arr).then(result => {
             ctx.body = { code: 1, data: '编辑患者成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            ctx.body = { code: 0, data: '编辑患者失败！' };
         });
     }
 
@@ -105,7 +107,7 @@ export default class PatientRouter {
             ctx.body = { code: 1, data: '删除患者成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            ctx.body = { code: 0, data: '删除患者失败！' };
         });
     }
 
@@ -126,7 +128,7 @@ export default class PatientRouter {
             ctx.body = { code: 1, data: patientInfo };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '数据库连接异常！' };
+            ctx.body = { code: 0, data: '获取详情失败！' };
         });
     }
 }
