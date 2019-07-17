@@ -13,6 +13,9 @@ const pretreatmentSchema = {
     is_alkalization: { type: 'number', required: true },
     is_prevent_diarrhea: { type: 'number', required: true }
 };
+const combinationSchema = {
+    patient_id: { type: 'number', required: true }
+};
 const searchPatientSchema = {
     page_number: { type: 'number', required: true },
     page_size: { type: 'number', required: true }
@@ -145,17 +148,29 @@ export default class PatientRouter {
     static async pretreatmentDetail(ctx) {
         const { id } = ctx.validatedParams;
         let sql = 'select * from patinet_pretreatment_condition where patient_id = ?';
+        let sql2 = 'select * from patient_drug_combination where patient_id = ? order by start_date asc';
         let arr = [id];
         let pretreatmentInfo = null
         await func.connPool(sql, arr).then(result => {
             if (result.length) {
                 pretreatmentInfo = result[0]
             }
-            ctx.body = { code: 1, data: pretreatmentInfo };
         }).catch(err => {
             console.log('err', err)
             ctx.body = { code: 0, data: '获取预处理详情失败！' };
         });
+        if (pretreatmentInfo) {
+            await func.connPool(sql2, arr).then(result => {
+                pretreatmentInfo.combinationList = result
+                ctx.body = { code: 1, data: pretreatmentInfo };
+            }).catch(err => {
+                console.log('err', err)
+                ctx.body = { code: 0, data: '获取预处理详情失败！' };
+            });
+        } else {
+            ctx.body = { code: 1, data: pretreatmentInfo };
+        }
+        
     }
 
     @request('POST', '/patient/addPretreatment')
@@ -193,6 +208,26 @@ export default class PatientRouter {
         }).catch(err => {
             console.log('err', err)
             ctx.body = { code: 0, data: '新增预处理失败！' };
+        });
+    }
+
+    @request('POST', '/patient/addCombination')
+    @summary('患者合并用药情况')
+    @description('患者合并用药情况')
+    @tag
+    @middlewares([logTime()])
+    @body(combinationSchema)
+    static async addCombination(ctx) {
+        let params = ctx.validatedBody;
+        let start_date = tools.dateFtt('yyyy-MM-dd', new Date(params.start_date))
+        let end_date = tools.dateFtt('yyyy-MM-dd', new Date(params.end_date))
+        let sql = 'INSERT INTO patient_drug_combination (patient_id, drug_name, start_date, end_date, purpose, dosage, drug_way, is_interaction, remark) VALUES(?,?,?,?,?,?,?,?,?)';
+        let arr = [params.patient_id, params.drug_name, start_date, end_date, params.purpose, params.dosage, params.drug_way, params.is_interaction, params.remark];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, data: '新增合并用药情况成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, data: '新增合并用药情况失败！' };
         });
     }
 }
