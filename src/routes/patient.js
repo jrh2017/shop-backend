@@ -164,11 +164,30 @@ export default class PatientRouter {
     @tag
     @middlewares([logTime()])
     @body(pretreatmentSchema)
-    static async addPatient(ctx) {
+    static async addPretreatment(ctx) {
         let params = ctx.validatedBody;
-        let create_time = tools.dateFtt('yyyy-MM-dd', new Date())
+        let create_time = tools.dateFtt('yyyy-MM-dd', new Date(params.create_date))
         let sql = 'INSERT INTO patinet_pretreatment_condition (patient_id, create_date, is_alkalization, is_alkalization_remark, is_prevent_diarrhea, is_prevent_diarrhea_remark) VALUES(?,?,?,?,?,?)';
         let arr = [params.patient_id, create_time, params.is_alkalization, params.is_alkalization_remark, params.is_prevent_diarrhea, params.is_prevent_diarrhea_remark];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, data: '新增预处理成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, data: '新增预处理失败！' };
+        });
+    }
+
+    @request('POST', '/patient/editPretreatment')
+    @summary('编辑预处理')
+    @description('表单编辑预处理功能')
+    @tag
+    @middlewares([logTime()])
+    @body(pretreatmentSchema)
+    static async editPretreatment(ctx) {
+        let params = ctx.validatedBody;
+        let create_time = tools.dateFtt('yyyy-MM-dd', new Date(params.create_date))
+        let sql = 'update patinet_pretreatment_condition set create_date = ?, is_alkalization = ?, is_alkalization_remark = ?, is_prevent_diarrhea = ?, is_prevent_diarrhea_remark = ? where id =?';
+        let arr = [create_time, params.is_alkalization, params.is_alkalization_remark, params.is_prevent_diarrhea, params.is_prevent_diarrhea_remark, params.id];
         await func.connPool(sql, arr).then(result => {
             ctx.body = { code: 1, data: '新增预处理成功！' };
         }).catch(err => {
