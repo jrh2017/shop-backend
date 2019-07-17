@@ -8,6 +8,11 @@ const tag = tags(['患者信息']);
 const patientSchema = {
     idcard: { type: 'string', required: true }
 };
+const pretreatmentSchema = {
+    patient_id: { type: 'number', required: true },
+    is_alkalization: { type: 'number', required: true },
+    is_prevent_diarrhea: { type: 'number', required: true }
+};
 const searchPatientSchema = {
     page_number: { type: 'number', required: true },
     page_size: { type: 'number', required: true }
@@ -129,6 +134,46 @@ export default class PatientRouter {
         }).catch(err => {
             console.log('err', err)
             ctx.body = { code: 0, data: '获取详情失败！' };
+        });
+    }
+
+    @request('GET', '/patient/pretreatmentDetail/{id}')
+    @summary('获取患者的预处理信息')
+    @description('根据ID获取患者的预处理信息')
+    @tag
+    @path({ id: { type: 'string', required: true } })
+    static async pretreatmentDetail(ctx) {
+        const { id } = ctx.validatedParams;
+        let sql = 'select * from patinet_pretreatment_condition where patient_id = ?';
+        let arr = [id];
+        let pretreatmentInfo = null
+        await func.connPool(sql, arr).then(result => {
+            if (result.length) {
+                pretreatmentInfo = result[0]
+            }
+            ctx.body = { code: 1, data: pretreatmentInfo };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, data: '获取预处理详情失败！' };
+        });
+    }
+
+    @request('POST', '/patient/addPretreatment')
+    @summary('添加预处理')
+    @description('表单添加预处理功能')
+    @tag
+    @middlewares([logTime()])
+    @body(pretreatmentSchema)
+    static async addPatient(ctx) {
+        let params = ctx.validatedBody;
+        let create_time = tools.dateFtt('yyyy-MM-dd', new Date())
+        let sql = 'INSERT INTO patinet_pretreatment_condition (patient_id, create_date, is_alkalization, is_alkalization_remark, is_prevent_diarrhea, is_prevent_diarrhea_remark) VALUES(?,?,?,?,?,?)';
+        let arr = [params.patient_id, create_time, params.is_alkalization, params.is_alkalization_remark, params.is_prevent_diarrhea, params.is_prevent_diarrhea_remark];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, data: '新增预处理成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, data: '新增预处理失败！' };
         });
     }
 }
