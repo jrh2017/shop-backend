@@ -16,6 +16,9 @@ const pretreatmentSchema = {
 const combinationSchema = {
     patient_id: { type: 'number', required: true }
 };
+const laboratorySchema = {
+    patient_id: { type: 'number', required: true }
+};
 const searchPatientSchema = {
     page_number: { type: 'number', required: true },
     page_size: { type: 'number', required: true }
@@ -44,10 +47,10 @@ export default class PatientRouter {
         let sql = 'INSERT INTO patient_basic_info (idcard, name, sex, age, height, weight, body_area, phone, bed_no, clinical_diagnosis, chemotherapy_history, allergy_history, physical_power, pleural_effussion, loose_stools, infection, renal_disease, hepatosis, radiation, other, other_desc, ugt1a1_28, ugt1a1_28_type, ugt1a1_6, ugt1a1_6_type, glucuronidase_blood, glucuronidase_blood_concentration, glucuronidase_shit, glucuronidase_shit_concentration, glucuronidase_undo, create_time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
         let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_type, params.ugt1a1_6, params.ugt1a1_6_type, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, new Date()];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '新增患者成功！' };
+            ctx.body = { code: 1, msg: '新增患者成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '新增患者失败！' };
+            ctx.body = { code: 0, msg: '新增患者失败！' };
         });
     }
 
@@ -71,12 +74,12 @@ export default class PatientRouter {
                 })
             }
         }).catch(err => {
-            ctx.body = { code: 0, data: '获取患者列表失败！' };
+            ctx.body = { code: 0, msg: '获取患者列表失败！' };
         });
         await func.connPool(sql2, []).then(result => {
             ctx.body = { code: 1, data: users, total: result[0].total}
         }).catch(err => {
-            ctx.body = { code: 0, data: '获取患者列表失败！' };
+            ctx.body = { code: 0, msg: '获取患者列表失败！' };
         });
     }
 
@@ -95,10 +98,10 @@ export default class PatientRouter {
         let sql = 'update patient_basic_info set idcard = ?, name = ?, sex = ?, age = ?, height = ?, weight = ?, body_area = ?, phone = ?, bed_no = ?, clinical_diagnosis = ?, chemotherapy_history = ?, allergy_history = ?, physical_power = ?, pleural_effussion = ?, loose_stools = ?, infection = ?, renal_disease = ?, hepatosis = ?, radiation = ?, other = ?, other_desc = ?, ugt1a1_28 = ?, ugt1a1_28_type = ?, ugt1a1_6 = ?, ugt1a1_6_type = ?, glucuronidase_blood = ?, glucuronidase_blood_concentration = ?, glucuronidase_shit = ?, glucuronidase_shit_concentration = ?, glucuronidase_undo = ? where id =?';
         let arr = [params.idcard, params.name, params.sex, params.age, params.height, params.weight, params.body_area, params.phone, params.bed_no, params.clinical_diagnosis, params.chemotherapy_history, params.allergy_history, params.physical_power, params.pleural_effussion, params.loose_stools, params.infection, params.renal_disease, params.hepatosis, params.radiation, params.other, params.other_desc, params.ugt1a1_28, params.ugt1a1_28_type, params.ugt1a1_6, params.ugt1a1_6_type, params.glucuronidase_blood, params.glucuronidase_blood_concentration, params.glucuronidase_shit, params.glucuronidase_shit_concentration, params.glucuronidase_undo, params.id];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '编辑患者成功！' };
+            ctx.body = { code: 1, msg: '编辑患者成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '编辑患者失败！' };
+            ctx.body = { code: 0, msg: '编辑患者失败！' };
         });
     }
 
@@ -112,10 +115,10 @@ export default class PatientRouter {
         let sql = 'update patient_basic_info set state = 0 where id = ?';
         let arr = [id];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '删除患者成功！' };
+            ctx.body = { code: 1, msg: '删除患者成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '删除患者失败！' };
+            ctx.body = { code: 0, msg: '删除患者失败！' };
         });
     }
 
@@ -136,7 +139,7 @@ export default class PatientRouter {
             ctx.body = { code: 1, data: patientInfo };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '获取详情失败！' };
+            ctx.body = { code: 0, msg: '获取详情失败！' };
         });
     }
 
@@ -149,6 +152,7 @@ export default class PatientRouter {
         const { id } = ctx.validatedParams;
         let sql = 'select * from patinet_pretreatment_condition where patient_id = ?';
         let sql2 = 'select * from patient_drug_combination where patient_id = ? order by start_date asc';
+        let sql3 = 'select * from patient_laboratory_exam where patient_id = ? order by use_date asc';
         let arr = [id];
         let pretreatmentInfo = null
         await func.connPool(sql, arr).then(result => {
@@ -157,16 +161,22 @@ export default class PatientRouter {
             }
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '获取预处理详情失败！' };
+            ctx.body = { code: 0, msg: '获取预处理详情失败！' };
         });
         if (pretreatmentInfo) {
             await func.connPool(sql2, arr).then(result => {
                 pretreatmentInfo.combinationList = result
-                ctx.body = { code: 1, data: pretreatmentInfo };
             }).catch(err => {
                 console.log('err', err)
-                ctx.body = { code: 0, data: '获取预处理详情失败！' };
+                ctx.body = { code: 0, msg: '获取预处理详情失败！' };
             });
+            await func.connPool(sql3, arr).then(result => {
+                pretreatmentInfo.laboratoryList = result
+            }).catch(err => {
+                console.log('err', err)
+                ctx.body = { code: 0, msg: '获取预处理详情失败！' };
+            });
+            ctx.body = { code: 1, data: pretreatmentInfo };
         } else {
             ctx.body = { code: 1, data: pretreatmentInfo };
         }
@@ -185,10 +195,10 @@ export default class PatientRouter {
         let sql = 'INSERT INTO patinet_pretreatment_condition (patient_id, create_date, is_alkalization, is_alkalization_remark, is_prevent_diarrhea, is_prevent_diarrhea_remark) VALUES(?,?,?,?,?,?)';
         let arr = [params.patient_id, create_time, params.is_alkalization, params.is_alkalization_remark, params.is_prevent_diarrhea, params.is_prevent_diarrhea_remark];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '新增预处理成功！' };
+            ctx.body = { code: 1, msg: '新增预处理成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '新增预处理失败！' };
+            ctx.body = { code: 0, msg: '新增预处理失败！' };
         });
     }
 
@@ -204,16 +214,16 @@ export default class PatientRouter {
         let sql = 'update patinet_pretreatment_condition set create_date = ?, is_alkalization = ?, is_alkalization_remark = ?, is_prevent_diarrhea = ?, is_prevent_diarrhea_remark = ? where id =?';
         let arr = [create_time, params.is_alkalization, params.is_alkalization_remark, params.is_prevent_diarrhea, params.is_prevent_diarrhea_remark, params.id];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '新增预处理成功！' };
+            ctx.body = { code: 1, msg: '新增预处理成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '新增预处理失败！' };
+            ctx.body = { code: 0, msg: '新增预处理失败！' };
         });
     }
 
     @request('POST', '/patient/addCombination')
-    @summary('患者合并用药情况')
-    @description('患者合并用药情况')
+    @summary('新增患者合并用药情况')
+    @description('新增患者合并用药情况')
     @tag
     @middlewares([logTime()])
     @body(combinationSchema)
@@ -224,10 +234,102 @@ export default class PatientRouter {
         let sql = 'INSERT INTO patient_drug_combination (patient_id, drug_name, start_date, end_date, purpose, dosage, drug_way, is_interaction, remark) VALUES(?,?,?,?,?,?,?,?,?)';
         let arr = [params.patient_id, params.drug_name, start_date, end_date, params.purpose, params.dosage, params.drug_way, params.is_interaction, params.remark];
         await func.connPool(sql, arr).then(result => {
-            ctx.body = { code: 1, data: '新增合并用药情况成功！' };
+            ctx.body = { code: 1, msg: '新增合并用药情况成功！' };
         }).catch(err => {
             console.log('err', err)
-            ctx.body = { code: 0, data: '新增合并用药情况失败！' };
+            ctx.body = { code: 0, msg: '新增合并用药情况失败！' };
+        });
+    }
+
+    @request('POST', '/patient/editCombination')
+    @summary('编辑患者合并用药情况')
+    @description('编辑患者合并用药情况')
+    @tag
+    @middlewares([logTime()])
+    @body(combinationSchema)
+    static async editCombination(ctx) {
+        let params = ctx.validatedBody;
+        let start_date = tools.dateFtt('yyyy-MM-dd', new Date(params.start_date))
+        let end_date = tools.dateFtt('yyyy-MM-dd', new Date(params.end_date))
+        let sql = 'update patient_drug_combination set drug_name = ?, start_date = ?, end_date = ?, purpose = ?, dosage = ?, drug_way = ?, is_interaction = ?, remark = ? where id = ?';
+        let arr = [params.drug_name, start_date, end_date, params.purpose, params.dosage, params.drug_way, params.is_interaction, params.remark, params.id];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, msg: '编辑合并用药情况成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, msg: '编辑合并用药情况失败！' };
+        });
+    }
+
+    @request('DELETE', '/patient/removeCombination/{id}')
+    @summary('删除合并用药情况')
+    @description('删除合并用药情况')
+    @tag
+    @path({ id: { type: 'string', required: true } })
+    static async removeCombination(ctx) {
+        const { id } = ctx.validatedParams;
+        let sql = 'delete from patient_drug_combination where id = ?';
+        let arr = [id];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, msg: '删除合并用药情况成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, msg: '删除合并用药情况失败！' };
+        });
+    }
+
+    @request('POST', '/patient/addLaboratory')
+    @summary('新增患者化疗前后实验室检查')
+    @description('新增患者化疗前后实验室检查')
+    @tag
+    @middlewares([logTime()])
+    @body(combinationSchema)
+    static async addLaboratory(ctx) {
+        let params = ctx.validatedBody;
+        let use_date = tools.dateFtt('yyyy-MM-dd', new Date(params.use_date))
+        let sql = 'INSERT INTO patient_laboratory_exam (patient_id, use_date, liver_alt, liver_ast, liver_alp, liver_tbil, kidney_crea, kidney_trioxypurine, kidney_ldh, blood_wbc, blood_plt, blood_hb, electrolyte_na, electrolyte_k, electrolyte_ca) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+        let arr = [params.patient_id, use_date, params.liver_alt, params.liver_ast, params.liver_alp, params.liver_tbil, params.kidney_crea, params.kidney_trioxypurine, params.kidney_ldh, params.blood_wbc, params.blood_plt, params.blood_hb, params.electrolyte_na, params.electrolyte_k, params.electrolyte_ca];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, msg: '新增患者化疗前后实验室检查成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, msg: '新增患者化疗前后实验室检查失败！' };
+        });
+    }
+
+    @request('POST', '/patient/editLaboratory')
+    @summary('编辑患者化疗前后实验室检查')
+    @description('编辑患者化疗前后实验室检查')
+    @tag
+    @middlewares([logTime()])
+    @body(laboratorySchema)
+    static async editLaboratory(ctx) {
+        let params = ctx.validatedBody;
+        let use_date = tools.dateFtt('yyyy-MM-dd', new Date(params.use_date))
+        let sql = 'update patient_laboratory_exam set use_date = ?, liver_alt = ?, liver_ast = ?, liver_alp = ?, liver_tbil = ?, kidney_crea = ?, kidney_trioxypurine = ?, kidney_ldh = ?, blood_wbc = ?, blood_plt = ?, blood_hb = ?, electrolyte_na = ?, electrolyte_k = ?, electrolyte_ca = ? where id = ?';
+        let arr = [use_date, params.liver_alt, params.liver_ast, params.liver_alp, params.liver_tbil, params.kidney_crea, params.kidney_trioxypurine, params.kidney_ldh, params.blood_wbc, params.blood_plt, params.blood_hb, params.electrolyte_na, params.electrolyte_k, params.electrolyte_ca, params.id];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, msg: '编辑患者化疗前后实验室检查成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, msg: '编辑患者化疗前后实验室检查失败！' };
+        });
+    }
+
+    @request('DELETE', '/patient/removeLaboratory/{id}')
+    @summary('删除患者化疗前后实验室检查')
+    @description('删除患者化疗前后实验室检查')
+    @tag
+    @path({ id: { type: 'string', required: true } })
+    static async removeLaboratory(ctx) {
+        const { id } = ctx.validatedParams;
+        let sql = 'delete from patient_laboratory_exam where id = ?';
+        let arr = [id];
+        await func.connPool(sql, arr).then(result => {
+            ctx.body = { code: 1, msg: '删除患者化疗前后实验室检查成功！' };
+        }).catch(err => {
+            console.log('err', err)
+            ctx.body = { code: 0, msg: '删除患者化疗前后实验室检查失败！' };
         });
     }
 }

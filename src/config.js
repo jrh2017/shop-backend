@@ -4,7 +4,7 @@ const common = {
 };
 const config = {
   develop: {
-    port: 3000,
+    port: 3016,
   },
   production: {
     port: 3016,

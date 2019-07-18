@@ -22,4 +22,3 @@ module.exports = {
     password:'Jrh20060607+',  
     database:'medicine',  
 }
-
